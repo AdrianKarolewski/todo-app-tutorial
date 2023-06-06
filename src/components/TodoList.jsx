@@ -2,44 +2,49 @@ import React, { useState } from 'react';
 import TodoItem from './TodoItem';
 
 const TodoList = () => {
-  // TASK 1: Replace the static todos with the following state variable
-  // see the TodoItem component for more details
   const [todos, setTodos] = useState([
     { id: 1, text: 'Learn Turkish 🧿', isCompleted: false },
     { id: 2, text: 'Be awesome 😎', isCompleted: true },
     { id: 3, text: 'Build a project 🚀', isCompleted: false },
   ]);
+
   const [newTodo, setNewTodo] = useState('');
 
   function handleAddTodo() {
-    // Task 2: Implement logic to add a new todo
-    // you can observe newTodo state variable is keeping the value of the input
-    // so you need to add the new todo to the todos state variable
-  };
+    if (newTodo.trim() !== '') {
+      const newId = todos.length > 0 ? todos[todos.length - 1].id + 1 : 1;
+      const newTodoItem = { id: newId, text: newTodo, isCompleted: false };
+      setTodos([...todos, newTodoItem]);
+      setNewTodo('');
+    }
+  }
 
   function handleDeleteAll() {
-    // Task 2: Implement logic to delete all todos
-  };
+    setTodos([]);
+  }
 
   function handleDelete(id) {
-    // Task 2: Implement logic to delete a todo
+    setTodos(todos.filter((todo) => todo.id !== id));
   }
 
   function handleHideCompleted() {
-
-    // Task 3: Implement logic to hide completed todos
-    // you might want to use a variable to store the state. like hideCompleted
-  };
+    // Toggle the visibility of completed todos
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.isCompleted ? { ...todo, isVisible: !todo.isVisible } : todo
+      )
+    );
+  }
 
   function handleCheckboxChange(id) {
-    // Task 3: Implement logic to update a todo
-    // warning! updating state of an object / array is a bit tricky
-    // only updating isCompleted field of the todo with the given id is not enough. you need to update the whole todos
-  };
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo
+      )
+    );
+  }
 
-  // Task 3: Implement logic to filter todos
-  // obviously you need to filter todos based on hideCompleted state variable
-  const filteredTodos = todos;
+  const filteredTodos = todos.filter((todo) => !todo.isVisible);
 
   return (
     <div className="max-w-md mx-auto rounded-md p-4 text-white">
@@ -70,8 +75,12 @@ const TodoList = () => {
       </button>
       <ul>
         {filteredTodos.map((todo) => (
-          // you need to pass some handler for deleting the todo and checkbox change
-          <TodoItem key={todo.id} todo={todo} />
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onCheckboxChange={handleCheckboxChange}
+            onDelete={handleDelete}
+          />
         ))}
       </ul>
     </div>
